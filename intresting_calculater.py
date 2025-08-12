@@ -3,6 +3,9 @@ from tkinter import ttk, filedialog, messagebox
 import random
 import os
 import requests
+import sys
+import subprocess
+from pathlib import Path
 
 # --- Налаштування ---
 CURRENT_VERSION = "1.0.0"
@@ -19,17 +22,46 @@ def check_for_update():
         response = requests.get(API_URL, timeout=5)
         data = response.json()
 
-        if data["version"] != CURRENT_VERSION:
-            messagebox.showinfo(
+        latest_version = data.get("version")
+        download_url = data.get("download_url")
+        changelog = data.get("changelog", "")
+
+        if latest_version != CURRENT_VERSION:
+            # Показуємо повідомлення і питаємо про оновлення
+            answer = messagebox.askyesno(
                 "Доступне оновлення",
-                f"Нова версія: {data['version']}\n\n"
-                f"Зміни:\n{data['changelog']}\n\n"
-                f"Завантажити: {data['download_url']}"
+                f"Нова версія: {latest_version}\n\n"
+                f"Зміни:\n{changelog}\n\n"
+                "Завантажити та встановити оновлення?"
             )
+            if answer:
+                download_update(download_url)
         else:
             messagebox.showinfo("Оновлень немає", "У вас встановлена остання версія.")
     except Exception as e:
         messagebox.showerror("Помилка", f"Не вдалося перевірити оновлення:\n{e}")
+
+def download_update(url):
+    try:
+        file_name = url.split("/")[-1]
+        file_path = Path(file_name)
+
+        # Завантаження файлу оновлення
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            with open(file_path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+
+        messagebox.showinfo("Успіх", f"Оновлення завантажено: {file_path}")
+
+        # Запускаємо нову версію і закриваємо поточну програму
+        subprocess.Popen([sys.executable, str(file_path)])
+        root.destroy()
+        sys.exit(0)
+    except Exception as e:
+        messagebox.showerror("Помилка при завантаженні", str(e))
 
 # --- Логіка вибору файлу ---
 def choose_file():
