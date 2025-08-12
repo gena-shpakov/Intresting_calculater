@@ -6,7 +6,7 @@ import requests
 
 # --- Налаштування ---
 CURRENT_VERSION = "1.0.0"
-API_URL = "https://example.com/api/latest-version"  # заміни на свій
+API_URL = "https://raw.githubusercontent.com/gena-shpakov/Intresting_calculater/main/check_update.json"
 
 PRIMARY_COLOR = "#4CAF50"  # Зелений Material
 SECONDARY_COLOR = "#2E7D32"
