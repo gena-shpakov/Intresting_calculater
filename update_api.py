@@ -2,15 +2,13 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route('/api/latest-version')
-def latest_version():
-    # Тут ти вказуєш актуальні дані про версію
-    data = {
-        "version": "1.0.1",
-        "changelog": "- Виправлено баги\n- Додано нові функції",
-        "download_url": "https://example.com/downloads/your_program_1.0.1.exe"
-    }
-    return jsonify(data)
+@app.route("/check_update", methods=["GET"])
+def check_update():
+    return jsonify({
+        "latest_version": "1.0.0",
+        "download_url": "https://github.com/gena-shpakov/Intresting_calculater/releases/download/v0.5.0/mysetup.exe",
+        "message": "Доступна нова версія! Завантаження..."
+    })
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
