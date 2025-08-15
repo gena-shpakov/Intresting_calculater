@@ -34,6 +34,25 @@ def check_for_update():
     except Exception as e:
         messagebox.showerror("Помилка", f"Не вдалося перевірити оновлення:\n{e}")
 
+
+def show_download_window(url):
+    win = tk.Toplevel()
+    win.title("Завантаження оновлення")
+    win.geometry("400x120")
+    win.resizable(False, False)
+
+    label = tk.Label(win, text="Завантаження... Будь ласка, зачекайте.")
+    label.pack(pady=10)
+
+    progress = ttk.Progressbar(win, length=300, mode='determinate')
+    progress.pack(pady=5)
+
+    percent_label = tk.Label(win, text="0%")
+    percent_label.pack()
+
+    threading.Thread(target=download_and_install, args=(url, progress, percent_label, win), daemon=True).start()
+
+
 def download_and_install(url):
     try:
         filename = os.path.basename(url)
